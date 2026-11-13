@@ -1,0 +1,11 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck
+        run: sudo apt-get install -y shellcheck && shellcheck sparktuner.sh
+      - name: Unit tests
+        run: bash tests/run.sh

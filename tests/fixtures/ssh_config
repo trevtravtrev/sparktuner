@@ -1,0 +1,6 @@
+Host spark-a
+	HostName 192.168.1.10
+Host spark-b
+Host *.wildcard
+Host ?question
+Host spark-a
