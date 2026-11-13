@@ -326,6 +326,7 @@ src_subnets() { # the /24 around each local address, minus our own addresses
   done
 }
 
+# shellcheck disable=SC2016 — single quotes are intentional: this must expand on the REMOTE host, not here
 PROBE_CMD='info="$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -n1)|$(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null)"; if printf "%s" "$info" | grep -qiE "GB10|DGX[ _-]?Spark"; then echo "SPARK $(cat /etc/machine-id 2>/dev/null || echo none) $(hostname)"; fi'
 parse_probe_line() { # LINE -> "machine-id hostname" (nothing if malformed)
   local id host
@@ -542,7 +543,7 @@ main() {
     exit 0
   fi
 
-  local targets=() host pick ok=0 failed=0 rc
+  local targets=() host pick ok=0 failed=0
   if [ ${#HOSTS[@]} -gt 0 ]; then
     targets=("${HOSTS[@]}")
   else
@@ -595,7 +596,7 @@ main() {
   fi
 
   local payload
-  payload=$( [ "$UNINSTALL" -eq 1 ] && uninstall_payload || install_payload )
+  if [ "$UNINSTALL" -eq 1 ]; then payload=$(uninstall_payload); else payload=$(install_payload); fi
   for host in "${targets[@]}"; do
     echo
     echo "=== $host ==="
