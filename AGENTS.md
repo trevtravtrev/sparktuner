@@ -38,7 +38,9 @@ ssh -t USER@SPARK 'sudo systemctl disable --now gdm.service'
 ```
 
 Skip this if the box is used for GNOME remote desktop — then attic only lends while
-GDM happens to be stopped.
+GDM happens to be stopped. A DGX OS update can restore the `display-manager.service`
+symlink, so after an upgrade re-check `systemctl show -p LoadState display-manager.service`
+(want `not-found`) and `nvidia-smi pmon` (want no type-G rows) before trusting a lend.
 
 ## 3. Verify with numbers, not adjectives
 
