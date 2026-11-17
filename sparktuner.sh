@@ -36,6 +36,14 @@ die() { log "sparktuner: $*"; exit 2; }
 
 usage() { sed -n '4,17p' "$0" | sed 's/^# \{0,1\}//'; }
 
+attic_hint() { # advisory text only: no writes, no ssh — the companion step this tool does not do
+  log ""
+  log "Companion step (sparktuner does not do this): spark-attic lends the GB10 display carveout to CUDA."
+  log "  install:  curl -fsSL https://github.com/bertholomus/spark-attic/releases/download/v0.1.4/install.sh | sudo bash"
+  log "  headless: sudo systemctl disable --now gdm.service   (atticd lends nothing while GDM's Xorg runs)"
+  log "  check:    spark-attic status   ·   agent notes: AGENTS.md"
+}
+
 validate_settings() {
   local max
   [[ "$GPU_CLOCKS" =~ ^[0-9]{1,5},[0-9]{1,5}$ ]] || die "invalid --gpu '$GPU_CLOCKS' (want MIN,MAX MHz, e.g. 0,2200)"
@@ -575,6 +583,7 @@ main() {
     done
     echo
     log "Verify done. OK: $ok  Failed: $failed"
+    attic_hint
     [ "$failed" -eq 0 ] || exit 1
     exit 0
   fi
@@ -606,6 +615,7 @@ main() {
 
   echo
   log "Done. OK: $ok  Failed: $failed"
+  attic_hint
   [ "$failed" -eq 0 ] || exit 1
   exit 0
 }

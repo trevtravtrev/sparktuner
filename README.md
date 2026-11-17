@@ -78,6 +78,21 @@ If `spark-gpu-clock-limit.service` is enabled on a host, sparktuner **disables i
 (same value, its own unit takes over — one owner per job, file kept). `--uninstall`
 prints the one-liner to re-enable sparkLimiter.
 
+## Companion: spark-attic (do this too)
+
+Clocking a headless Spark leaves about 2 GiB of memory on the table: the GB10 driver
+reserves a display carveout at boot that nothing uses and Linux never counts.
+[spark-attic](https://github.com/bertholomus/spark-attic) lends it to CUDA programs
+(measured: +2,044 MiB KV cache, identical replies, decode within noise; atticd costs
+~1.7 MB RAM and ~0.1 % CPU). sparktuner does not install it — it prints the reminder
+after every apply and verify run, and [AGENTS.md](AGENTS.md) gives the full steps for
+agents: install the pinned v0.1.4 release, disable GDM on headless boxes (GDM's Xorg
+is a graphics process, so `atticd` lends nothing while it runs), and verify with a
+borrow that shows `lent_mib` rise and return to 0.
+
+The carveout only helps an engine that opts in (vLLM/SGLang plugin; TensorFold needs
+upstream #2762/#2763 plus `TF_CUDA_CARVEOUT_SOURCE=attic`). One lender at a time.
+
 ## Requirements
 
 DGX Spark (GB10) with DGX OS + systemd + NVIDIA driver; key-based ssh from the
